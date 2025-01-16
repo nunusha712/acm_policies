@@ -1,37 +1,43 @@
 apiVersion: operator.open-cluster-management.io/v1
 kind: ClusterPolicy
 metadata:
-  name: delete-kubeadmin-policy
+  name: delete-kubeadmin-user-policy
   namespace: openshift-config-managed
 spec:
   remediationAction: enforce
   policy-templates:
     - complianceType: musthave
       objectDefinition:
-        apiVersion: admissionregistration.k8s.io/v1
-        kind: MutatingWebhookConfiguration
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: RoleBinding
         metadata:
-          name: delete-kubeadmin-webhook
-        webhooks:
-          - name: delete-kubeadmin
-            clientConfig:
-              service:
-                name: delete-kubeadmin-service
-                namespace: open-cluster-management
-                path: "/delete-kubeadmin"
-            rules:
-              - operations: ["DELETE"]
-                apiGroups: [""]
-                apiVersions: ["v1"]
-                resources: ["users"]
+          name: kubeadmin-rolebinding
+          namespace: kube-system
+        subjects:
+          - kind: User
+            name: kubeadmin
+        roleRef:
+          kind: ClusterRole
+          name: cluster-admin
+          apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: operator.open-cluster-management.io/v1
-kind: PlacementRule
+kind: Placement
 metadata:
-  name: delete-kubeadmin-placementrule
+  name: delete-kubeadmin-user-placement
   namespace: openshift-config-managed
 spec:
   clusterSelector: {}
-  resourceSelectors:
-    - apiVersion: apps.open-cluster-management.io/v1
-      kind: ManagedCluster
+---
+apiVersion: operator.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: delete-kubeadmin-user-binding
+  namespace: openshift-config-managed
+spec:
+  placementRef:
+    name: delete-kubeadmin-user-placement
+  subjects:
+    - kind: User
+      name: "cluster-admin"
+      apiGroup: rbac.authorization.k8s.io
