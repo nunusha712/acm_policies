@@ -1,0 +1,31 @@
+apiVersion: operator.openshift.io/v1
+kind: ClusterPolicy
+metadata:
+  name: set-upgrade-channel-policy
+  namespace: openshift-config-management
+spec:
+  policyLibraryRef:
+    name: rhacm-policies
+  remediationAction: enforce
+  applyTo:
+    clusters:
+      - name: '*'
+  configurationPolicy:
+    apiVersion: policy.open-cluster-management.io/v1
+    kind: ConfigurationPolicy
+    metadata:
+      name: set-upgrade-channel
+    spec:
+      remediationAction: enforce
+      namespaceSelector:
+        include:
+          - '*'
+      policy-templates:
+        - objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterVersion
+            metadata:
+              name: version
+            spec:
+              channel: "stable-4.16"  
+      validationFailureAction: enforce
