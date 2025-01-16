@@ -2,7 +2,7 @@ apiVersion: operator.openshift.io/v1
 kind: ClusterPolicy
 metadata:
   name: set-upgrade-channel-policy
-  namespace: openshift-config-management
+  namespace: openshift-config-managed
 spec:
   policyLibraryRef:
     name: rhacm-policies
