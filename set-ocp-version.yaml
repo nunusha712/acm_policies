@@ -1,31 +1,37 @@
-apiVersion: operator.openshift.io/v1
+apiVersion: operator.open-cluster-management.io/v1
 kind: ClusterPolicy
 metadata:
   name: set-upgrade-channel-policy
   namespace: openshift-config-managed
 spec:
-  policyLibraryRef:
-    name: rhacm-policies
   remediationAction: enforce
-  applyTo:
-    clusters:
-      - name: '*'
-  configurationPolicy:
-    apiVersion: policy.open-cluster-management.io/v1
-    kind: ConfigurationPolicy
-    metadata:
-      name: set-upgrade-channel
-    spec:
-      remediationAction: enforce
-      namespaceSelector:
-        include:
-          - '*'
-      policy-templates:
-        - objectDefinition:
-            apiVersion: config.openshift.io/v1
-            kind: ClusterVersion
-            metadata:
-              name: version
-            spec:
-              channel: "stable-4.16"  
-      validationFailureAction: enforce
+  policy-templates:
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: operator.openshift.io/v1
+        kind: ClusterOperator
+        metadata:
+          name: openshift-cluster-version
+        spec:
+          channel: stable-4.16
+---
+apiVersion: operator.open-cluster-management.io/v1
+kind: Placement
+metadata:
+  name: set-upgrade-channel-placement
+  namespace: openshift-config-managed
+spec:
+  clusterSelector: {}
+---
+apiVersion: operator.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: set-upgrade-channel-binding
+  namespace: openshift-config-managed
+spec:
+  placementRef:
+    name: set-upgrade-channel-placement
+  subjects:
+    - kind: User
+      name: "cluster-admin"
+      apiGroup: rbac.authorization.k8s.io
