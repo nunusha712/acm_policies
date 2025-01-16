@@ -2,7 +2,7 @@ apiVersion: operator.open-cluster-management.io/v1
 kind: ClusterPolicy
 metadata:
   name: delete-kubeadmin-policy
-  namespace: open-cluster-managed
+  namespace: openshift-config-managed
 spec:
   remediationAction: enforce
   policy-templates:
@@ -29,7 +29,7 @@ apiVersion: operator.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
   name: delete-kubeadmin-placementrule
-  namespace: open-cluster-managed
+  namespace: openshift-config-managed
 spec:
   clusterSelector: {}
   resourceSelectors:
